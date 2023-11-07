@@ -6,7 +6,7 @@ def process_word(word):
     print(f"{word}: {count_e} 'e's")
 
 def main():
-    input_file = open("big_text_file.txt", "r")
+    input_file = open("big.txt", "r")
 
     def read_file():
         for line in input_file:
