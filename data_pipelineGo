@@ -1,0 +1,50 @@
+package main
+
+import (
+    "bufio"
+    "fmt"
+    "os"
+    "sync"
+    "strings"
+)
+
+func main() {
+    file, err := os.Open("big_text_file.txt")
+    if err != nil {
+        fmt.Println("Error opening the file:", err)
+        return
+    }
+    defer file.Close()
+
+    scanner := bufio.NewScanner(file)
+    var wg sync.WaitGroup
+
+    // Create a channel to pass data between goroutines
+    dataChannel := make(chan string)
+
+    // Data Processing Stage: Read data from the file
+    go func() {
+        defer close(dataChannel)
+        for scanner.Scan() {
+            line := scanner.Text()
+            words := strings.Fields(line)
+            for _, word := range words {
+                dataChannel <- word
+            }
+        }
+    }()
+
+    // Data Processing Stage: Calculate the number of 'e's
+    go func() {
+        wg.Add(1)
+        defer wg.Done()
+        for word := range dataChannel {
+            countE := strings.Count(word, "e")
+            // You can process the countE value here or store it as needed
+            fmt.Printf("%s: %d 'e's\n", word, countE)
+        }
+    }()
+
+    // Wait for all goroutines to finish
+    wg.Wait()
+}

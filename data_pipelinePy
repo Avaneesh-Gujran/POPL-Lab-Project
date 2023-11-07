@@ -1,0 +1,36 @@
+import threading
+
+def process_word(word):
+    count_e = word.count('e')
+    # You can process the count_e value here or store it as needed
+    print(f"{word}: {count_e} 'e's")
+
+def main():
+    input_file = open("big_text_file.txt", "r")
+
+    def read_file():
+        for line in input_file:
+            words = line.split()
+            for word in words:
+                data_queue.put(word)
+
+    def process_words():
+        while True:
+            word = data_queue.get()
+            process_word(word)
+
+    data_queue = queue.Queue()
+    read_thread = threading.Thread(target=read_file)
+    process_thread = threading.Thread(target=process_words)
+
+    read_thread.start()
+    process_thread.start()
+
+    read_thread.join()
+    process_thread.join()
+
+    input_file.close()
+
+if __name__ == "__main__":
+    main()
+
